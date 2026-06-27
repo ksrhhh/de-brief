@@ -1,0 +1,124 @@
+# sources.yaml
+# Each source has: name, feed_url, category hint, and access notes.
+# access: "full" = full article text in feed
+#         "teaser" = headline + 1-3 sentence summary only (paywalled full article)
+#         "summary" = a free, already-condensed digest (not paywalled, e.g. Wall St Breakfast)
+#
+# To add/remove a source: just add/remove an entry below. fetch.py reads this file
+# and doesn't need code changes for ordinary source list edits.
+
+sources:
+  # --- Wire / broad news ---
+  - name: BBC News (World)
+    feed_url: https://feeds.bbci.co.uk/news/world/rss.xml
+    access: full
+    notes: Fully open, no paywall.
+
+  - name: BBC News (Business)
+    feed_url: https://feeds.bbci.co.uk/news/business/rss.xml
+    access: full
+
+  - name: Reuters (via Google News fallback)
+    feed_url: "https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com&hl=en-US&gl=US&ceid=US:en"
+    access: teaser
+    notes: Reuters killed native RSS ~2020. This Google News search-as-feed trick scopes
+      results to reuters.com domain in the last 24h. Headline + snippet only.
+
+  # --- UK / international weeklies ---
+  - name: The Economist (Finance & Economics)
+    feed_url: https://www.economist.com/finance-and-economics/rss.xml
+    access: teaser
+    notes: User has personal Economist subscription. Automated fetch only gets the
+      free teaser; flag high-value items in the briefing so the user can click through
+      manually while logged in on their own device.
+
+  - name: The Economist (International)
+    feed_url: https://www.economist.com/international/rss.xml
+    access: teaser
+
+  - name: The Economist (Leaders)
+    feed_url: https://www.economist.com/leaders/rss.xml
+    access: teaser
+
+  # --- US papers ---
+  - name: Financial Times (World)
+    feed_url: https://www.ft.com/world?format=rss
+    access: teaser
+
+  - name: Wall Street Journal (Economy)
+    feed_url: https://feeds.content.dowjones.io/public/rss/RSSWSJD
+    access: teaser
+    notes: Verify this exact path when first run; WSJ occasionally rotates feed paths.
+
+  - name: New York Times (World)
+    feed_url: https://rss.nytimes.com/services/xml/rss/nyt/World.xml
+    access: teaser
+
+  - name: New York Times (Business)
+    feed_url: https://rss.nytimes.com/services/xml/rss/nyt/Business.xml
+    access: teaser
+
+  - name: The Atlantic
+    feed_url: https://www.theatlantic.com/feed/all/
+    access: teaser
+
+  # --- Policy / IR ---
+  - name: Politico (Politics)
+    feed_url: https://rss.politico.com/politics-news.xml
+    access: full
+
+  - name: Politico (Defense)
+    feed_url: https://rss.politico.com/defense.xml
+    access: full
+
+  - name: Politico (Economy)
+    feed_url: https://rss.politico.com/economy.xml
+    access: full
+
+  - name: Foreign Affairs
+    feed_url: https://www.foreignaffairs.com/rss.xml
+    access: teaser
+    notes: Free RSS gives full headline + dek; long-form essays are subscriber-only.
+
+  - name: Council on Foreign Relations / Michael Froman
+    feed_url: https://www.cfr.org/rss/full-feed
+    access: full
+    notes: CFR site content is free; confirm exact feed path on first run (cfr.org/rss
+      directory may have multiple topical feeds — president's weekly column is tagged
+      separately, verify on first fetch and narrow if needed).
+
+  # --- Finance / markets ---
+  - name: Matt Levine — Money Stuff (Bloomberg Opinion)
+    feed_url: https://www.bloomberg.com/opinion/authors/ARbTQlRLRjE/matthew-s-levine.rss
+    access: teaser
+    notes: Bloomberg Opinion is subscriber-gated; feed gives headline + short teaser.
+      Confirm exact RSS path on first run (Bloomberg's feed URLs shift periodically).
+
+  - name: Wall Street Breakfast (Seeking Alpha)
+    feed_url: https://seekingalpha.com/market_currents.xml
+    access: summary
+    notes: This is already a condensed daily digest — minimal extra synthesis needed,
+      mostly just debate-framing on top. Verify exact feed path on first run; Seeking
+      Alpha's feed directory is at about.seekingalpha.com/feeds.
+
+  # --- Law / Courts ---
+  - name: SCOTUSblog
+    feed_url: https://www.scotusblog.com/feed/
+    access: full
+
+  # --- Environment ---
+  - name: UN Climate Change News
+    feed_url: https://news.un.org/feed/subscribe/en/news/topic/climate-change/feed/rss.xml
+    access: full
+
+# Categories used for grouping in the synthesized briefing.
+# fetch.py tags each story with the best-fit category at synthesis time (via the
+# Claude API call), not here — this list is just what's offered as options.
+categories:
+  - International Relations / Conflict
+  - Finance & Economics
+  - Tech & AI Policy
+  - Law / Courts
+  - Environment
+  - Social Movements
+  - History (recurring analogies, not "news" but resurfaced when relevant)

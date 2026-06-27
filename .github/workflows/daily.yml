@@ -1,0 +1,49 @@
+name: Daily Debate Briefing
+
+on:
+  schedule:
+    # 6:00 AM UTC daily. Adjust for your timezone — see README for how to
+    # convert this to your local morning time.
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}  # lets you manually trigger a run from the Actions tab
+
+permissions:
+  contents: write  # needed to commit the generated briefing back to the repo
+
+jobs:
+  build-and-send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch sources
+        run: python fetch.py --since-hours 24 --out raw_stories.json
+
+      - name: Synthesize briefing
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python synthesize.py --in raw_stories.json --mode daily
+
+      - name: Send email
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          BRIEFING_FROM_EMAIL: ${{ secrets.BRIEFING_FROM_EMAIL }}
+          BRIEFING_TO_EMAIL: ${{ secrets.BRIEFING_TO_EMAIL }}
+        run: python send_email.py --in briefings/_latest_daily.md --mode daily
+
+      - name: Commit archived briefing
+        run: |
+          git config user.name "debate-briefing-bot"
+          git config user.email "actions@github.com"
+          git add briefings/
+          git diff --quiet --cached || git commit -m "Daily briefing $(date -u +%Y-%m-%d)"
+          git push
