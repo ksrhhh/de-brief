@@ -4,7 +4,7 @@ on:
   schedule:
     # 6:00 AM UTC daily. Adjust for your timezone — see README for how to
     # convert this to your local morning time.
-    - cron: "0 6 * * *"
+    - cron: "0 14 * * *"
   workflow_dispatch: {}  # lets you manually trigger a run from the Actions tab
 
 permissions:
