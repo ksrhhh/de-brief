@@ -34,7 +34,23 @@ movements, and history-adjacent sources.
 
 Your job: select the genuinely significant, debate-relevant stories (skip routine \
 or low-stakes items) and write them up following this EXACT structure for each \
-story, in markdown:
+story, in markdown.
+
+CRITICAL: Do NOT write a top-level title or header for the briefing as a whole \
+(no "# Debate Briefing", no date, no "🗞️" banner line). The calling script \
+already adds that header. Your response must start DIRECTLY with the first \
+story's category header (##), nothing before it.
+
+Use EXACTLY one of these categories for each story (do not invent new category \
+names or emoji — pick the closest fit from this fixed list):
+- 🌍 International Relations / Conflict
+- 💰 Finance & Economics
+- 🤖 Tech & AI Policy
+- ⚖️ Law / Courts
+- 🌎 Environment
+- ✊ Social Movements
+- 📜 History (use this when a current event's best framing is a historical \
+parallel/precedent, not just "old news")
 
 ## [emoji] [Category]
 
@@ -67,13 +83,33 @@ tension recurs, since judges reward debaters who show an argument generalizes.]
 
 ---
 
-After all stories, add a final section:
+After all stories, add a final section. The content of this section DEPENDS on \
+whether this is a DAILY or WEEKLY briefing — you will be told which mode you're \
+in. Follow the matching instructions below exactly; do not blend them.
 
+IF DAILY MODE:
 ## 🧠 Cross-Story Connections
 [1-3 sentences max, only if there's a genuine, non-forced link between two or \
 more of today's stories — e.g. the same underlying principle, or one story's \
 infrastructure feeding another's controversy. Skip this section entirely if \
 there's no real connection; don't manufacture one.]
+
+IF WEEKLY MODE: produce a genuinely retrospective section, not just "more \
+stories with a connections paragraph at the end." This is what makes weekly \
+worth reading separately from seven dailies:
+## 🧠 This Week's Throughlines
+[2-4 short sub-sections, each 2-4 sentences:]
+- **What moved:** for any story that appeared earlier in the week and evolved \
+(new facts, reversal, escalation/de-escalation), say specifically what changed \
+and whether a motion angle from earlier in the week would now need updating — \
+debaters should learn that "the facts changed under you" is itself a real \
+phenomenon to track, not just get a fresh snapshot.
+- **The throughline:** if 2+ stories this week share a deep structural principle \
+(not a surface topic), name it explicitly and say which stories instantiate it \
+differently — this is the connective tissue a single day's news can't show.
+- **What's still unresolved going into next week:** 1-2 sentences flagging which \
+story is most likely to keep developing and is worth tracking specifically, so \
+the debater knows where to look first next time a relevant motion comes up.
 
 RULES:
 - Never invent facts. If the source material is thin on background, say so \
@@ -82,6 +118,13 @@ honestly rather than fabricating specifics.
 - Pick at most 5-7 stories total for a daily briefing — quality and depth over \
 breadth. If there are more good stories than that, pick the ones with the \
 richest debate angles, not just the most "important" ones by news-cycle standards.
+- Don't default only to stories with an obvious breaking-news hook. Actively \
+look for at least one Social Movements or History-angle story per briefing if \
+the source material supports it even loosely — these categories are easy to \
+skip in favor of fast-moving headlines, and that's a bias to actively correct \
+for, not a natural outcome to accept. If genuinely nothing fits either category \
+this cycle, it's fine to skip — but check for it deliberately rather than \
+defaulting to whatever has the most urgent-sounding headline.
 - Vary which categories appear based on what's actually newsworthy that day — \
 don't force a story into a weak category just for coverage.
 - Write in a direct, sharp register — this is for someone who will use it to \
@@ -91,7 +134,17 @@ argue in front of judges in under an hour, not light reading.
 
 def build_user_prompt(stories, mode):
     window_label = "the last 24 hours" if mode == "daily" else "the last 7 days"
-    lines = [f"Here are {len(stories)} raw stories from {window_label}. Build the briefing.\n"]
+    mode_instruction = (
+        "You are in DAILY MODE. Use the 'Cross-Story Connections' closing section format."
+        if mode == "daily"
+        else "You are in WEEKLY MODE. Use the 'This Week's Throughlines' closing section "
+             "format — be genuinely retrospective, not just a longer daily."
+    )
+    lines = [
+        f"Here are {len(stories)} raw stories from {window_label}. Build the briefing.",
+        mode_instruction,
+        "",
+    ]
     for s in stories:
         lines.append(
             f"- [{s['source']}] {s['title']}\n  {s['summary'][:500]}\n  ({s['link']})"
