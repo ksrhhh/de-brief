@@ -2,7 +2,7 @@ name: Daily Debate Briefing
 
 on:
   schedule:
-    # 6:00 AM UTC daily. Adjust for your timezone — see README for how to
+    # 2:00 PM UTC daily. Adjust for your timezone — see README for how to
     # convert this to your local morning time.
     - cron: "0 14 * * *"
   workflow_dispatch: {}  # lets you manually trigger a run from the Actions tab
@@ -46,4 +46,8 @@ jobs:
           git config user.email "actions@github.com"
           git add briefings/
           git diff --quiet --cached || git commit -m "Daily briefing $(date -u +%Y-%m-%d)"
+          # Pull any commits made by a concurrently-running workflow (e.g. the
+          # weekly deep dive) before pushing, to avoid a rejected push if both
+          # happen to run around the same time. Rebase keeps history linear.
+          git pull --rebase origin main
           git push
