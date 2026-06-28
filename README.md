@@ -1,6 +1,6 @@
 # Debate Briefing Pipeline
 
-Automated daily + weekly BP/Parli debate briefings, emailed to you and archived
+Automated daily + weekly BP debate briefings, emailed to you and archived
 in this repo.
 
 ## How it works
