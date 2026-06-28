@@ -2,8 +2,8 @@ name: Weekly Debate Deep Dive
 
 on:
   schedule:
-    # 6:00 AM UTC every Sunday. Adjust day/time as needed — see README.
-    - cron: "0 6 * * 0"
+    # 2:00 PM UTC every Satruday. Adjust day/time as needed — see README.
+    - cron: "0 14 * * 6"
   workflow_dispatch: {}
 
 permissions:
@@ -45,4 +45,8 @@ jobs:
           git config user.email "actions@github.com"
           git add briefings/
           git diff --quiet --cached || git commit -m "Weekly deep dive $(date -u +%Y-%m-%d)"
+          # Pull any commits made by a concurrently-running workflow (e.g. the
+          # daily briefing) before pushing, to avoid a rejected push if both
+          # happen to run around the same time. Rebase keeps history linear.
+          git pull --rebase origin main
           git push
